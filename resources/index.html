@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hypnos Engine</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+  <main>
+    <section id="entityEditor">
+      <h1>Hierarchy</h1>
+      <nav id="entityButtons">
+        <select id="addElementSelect">
+          <option>Entity</option>
+        </select>
+        <button id="addParentButton">Add as parent</button>
+        <button id="addChildButton">Add as child</button>
+      </nav>
+      <div id="entityContent"></div>
+      <nav>
+        <button id="saveSceneButton">Save scene</button>
+        <button id="buildProjectButton">Build executables</button>
+      </nav>
+      <section id="assetsEditor">
+        <h1>Assets</h1>
+        <h2>🌐 Scenes</h2>
+        <section id="sceneAssets"></section>
+        <nav>
+          <button id="addSceneButton">Create new scene</button>
+        </nav>
+        <h2>🗿 Geometries</h2>
+        <section id="geoAssets"></section>
+        <nav>
+          <button id="addGeoButton">Create new geometry</button>
+        </nav>
+        <h2>🖼️ Textures</h2>
+        <section id="texAssets"></section>
+        <nav>
+          <button id="addTexButton">Create new texture</button>
+        </nav>
+        <h2>🎵 Audio clips</h2>
+        <section id="clipAssets"></section>
+        <nav>
+          <button id="addClipButton">Create new audio clip</button>
+        </nav>
+      </section>
+      <!-- <nav>
+        <button id="buildProjectButton">Build executables</button>
+      </nav> -->
+    </section>
+    <section id="mainCanvas">
+      <aside>
+        <span id="fps">FPS : NaN</span>
+      </aside>
+      <canvas id="hypnos"></canvas>
+    </section>
+    <section id="mainInspector">
+      <h1>Inspector</h1>
+      <div id="inspectorContent"></div>
+    </section>
+  </main>
+  <!-- Your libs -->
+  <script src="./lib/monaco.min.js"></script>
+  <!-- Neutralino.js client. This file is gitignored, 
+        because `neu update` typically downloads it.
+        Avoid copy-pasting it. 
+        -->
+  <script src="./neutralino.js"></script>
+  <!-- Your app's source files -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hypnos Engine</title>
+  <style>
+    #mainCanvas {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      display: flex;
+      user-select: none;
+      background-color: black;
+      overflow: hidden;
+
+      aside {
+        position: absolute;
+        margin: 25px 40px;
+        z-index: 100;
+        user-select: none;
+        color: yellow;
+
+        #fps {
+          font-size: 12px;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+      }
+
+      #glCanvas {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="mainCanvas">
+    <aside>
+      <span id="fps">FPS : NaN</span>
+    </aside>
+    <canvas id="glCanvas"></canvas>
+  </main>
+  <script src="./neutralino.js"></script>
+  <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>

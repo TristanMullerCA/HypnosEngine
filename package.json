@@ -1,0 +1,17 @@
+{
+    "name": "hypnos-engine",
+    "version": "0.1.0",
+    "scripts": {
+        "minify": "node minify.js",
+        "start": "neu run",
+        "build": "neu build",
+        "lint": "eslint . --fix"
+    },
+    "devDependencies": {
+        "@eslint/compat": "^2.0.2",
+        "esbuild": "^0.27.3",
+        "eslint": "^10.0.2",
+        "eslint-plugin-import": "^2.32.0",
+        "glob": "^13.0.6"
+    }
+}
