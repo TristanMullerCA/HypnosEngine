@@ -28,33 +28,28 @@ jobs:
 
       - name: Build Hypnos Engine
         run: neu build
-        continue-on-error: false
-
-      - name: Locate Build Output (Universal Search)
-        run: |
-          echo "Searching for resources.neu..."
-          find . -name "resources.neu"
-          echo "Full directory tree (depth 3):"
-          find . -maxdepth 3 -not -path '*/.*'
-
-      - name: List files for debugging
-        run: ls -R
 
       - name: Package Platforms
         run: |
           mkdir -p artifacts
-          RESOURCES_PATH=$(find . -name "resources.neu" | head -n 1)
-          BUILD_DIR=$(dirname "$RESOURCES_PATH")
+          # On cherche où est le dossier de sortie, peu importe son nom
+          SEARCH_DIR=$(find . -name "resources.neu" -not -path "./node_modules/*" | head -n 1 | xargs dirname)
           
-          echo "Build directory found at: $BUILD_DIR"
+          if [ -z "$SEARCH_DIR" ]; then
+            echo "Erreur : resources.neu introuvable après le build."
+            exit 1
+          fi
+
+          echo "Dossier de build détecté : $SEARCH_DIR"
           
-          cd "$BUILD_DIR"
+          # On entre dans le dossier et on prépare les packages
+          cd "$SEARCH_DIR"
           for exe in hypnos-engine-*; do
             if [ -f "$exe" ]; then
               platform=${exe%.*}
-              zip_name="../../../artifacts/${platform}.zip"
-              zip -j "$zip_name" "$exe" "resources.neu"
+              # On aplatit tout dans un zip à la racine des artifacts
               zip -j "${{ github.workspace }}/artifacts/${platform}.zip" "$exe" "resources.neu"
+              echo "Package créé pour $platform"
             fi
           done
 
@@ -65,10 +60,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.tag.outputs.tag_name }}
-          name: Release ${{ steps.tag.outputs.tag_name }}
-          draft: false
-          prerelease: false
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
           files: artifacts/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

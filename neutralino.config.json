@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
-  "applicationId": "js.neutralino.sample",
+  "applicationId": "ca.tristanmuller.hypnosengine",
   "version": "1.0.0",
   "defaultMode": "window",
   "port": 0,
@@ -42,6 +42,7 @@
   },
   "cli": {
     "binaryName": "hypnos-engine",
+    "binaryDest": "dist/hypnos-engine",
     "resourcesPath": "/resources/",
     "extensionsPath": "/extensions/",
     "clientLibrary": "/resources/neutralino.js",
