@@ -28,6 +28,14 @@ jobs:
 
       - name: Build Hypnos Engine
         run: neu build
+        continue-on-error: false
+
+      - name: Locate Build Output (Universal Search)
+        run: |
+          echo "Searching for resources.neu..."
+          find . -name "resources.neu"
+          echo "Full directory tree (depth 3):"
+          find . -maxdepth 3 -not -path '*/.*'
 
       - name: List files for debugging
         run: ls -R
@@ -46,7 +54,7 @@ jobs:
               platform=${exe%.*}
               zip_name="../../../artifacts/${platform}.zip"
               zip -j "$zip_name" "$exe" "resources.neu"
-              echo "Packaged $exe into $zip_name"
+              zip -j "${{ github.workspace }}/artifacts/${platform}.zip" "$exe" "resources.neu"
             fi
           done
 
