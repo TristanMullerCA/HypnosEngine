@@ -3,13 +3,13 @@ name: Build and Release Hypnos Engine
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch: # Permet de lancer le build manuellement si besoin
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # Obligatoire pour créer la release
 
     steps:
       - name: Checkout code
@@ -28,22 +28,42 @@ jobs:
 
       - name: Build Hypnos Engine
         run: |
-          # On s'assure que zip est installé (requis par neu build pour resources.neu)
           sudo apt-get update && sudo apt-get install -y zip
           neu build
 
-      - name: Check if dist exists
+      - name: Package Platforms
         run: |
-          echo "Checking directory structure..."
-          ls -R
-          # Si dist n'existe pas, on tente de le trouver
-          find . -name "resources.neu"
+          mkdir -p artifacts
+          RESOURCES_PATH=$(find . -name "resources.neu" | head -n 1)
+          BUILD_DIR=$(dirname "$RESOURCES_PATH")
+          
+          echo "Build directory found at: $BUILD_DIR"
+          
+          cd "$BUILD_DIR"
+          ls -lh
 
-      - name: Upload Build
-        uses: actions/upload-artifact@v4
+          for exe in hypnos-engine-*; do
+            if [ -f "$exe" ]; then
+              platform=${exe%.*}
+              zip_name="../../../artifacts/${platform}.zip"
+              zip -j "$zip_name" "$exe" "resources.neu"
+              zip -j "${{ github.workspace }}/artifacts/${platform}.zip" "$exe" "resources.neu"
+            fi
+          done
+
+          # Vérification finale avant de quitter l'étape
+          echo "Contenu du dossier artifacts :"
+          ls -lh "${{ github.workspace }}/artifacts"
+
+      - name: Generate Release Tag
+        id: tag
+        run: echo "tag_name=v$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: hypnos-build-all
-          path: |
-            dist/**
-            bin/**
-          if-no-files-found: error
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          files: ${{ github.workspace }}/artifacts/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
