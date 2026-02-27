@@ -27,41 +27,38 @@ jobs:
         run: npm install
 
       - name: Build Hypnos Engine
-        run: neu build
-        continue-on-error: false
+        run: neu build --verbose
 
-      - name: Find and Package
+      - name: Deep Search and Package
         run: |
           mkdir -p "${{ github.workspace }}/artifacts"
           
-          # 1. Localiser le fichier resources.neu
+          echo "=== RECHERCHE GLOBALE DU FICHIER RESOURCES.NEU ==="
+          # On cherche absolument partout, même en dehors de la racine
+          find . -name "resources.neu" -not -path "*/node_modules/*"
+          
+          # On tente de localiser le binaire par défaut de Neutralino
+          # (Souvent nommé 'neutralino-win_x64.exe' ou selon l'ID du projet)
+          
           RESOURCES_FILE=$(find . -name "resources.neu" -not -path "*/node_modules/*" | head -n 1)
+          
           if [ -z "$RESOURCES_FILE" ]; then
-            echo "ERREUR : resources.neu introuvable. Le build a probablement échoué."
+            echo "ERREUR CRITIQUE : Neutralino n'a rien généré."
+            echo "Vérifie si ton fichier neutralino.config.json est valide."
             exit 1
           fi
           
           BUILD_DIR=$(dirname "$RESOURCES_FILE")
-          echo "Dossier de build détecté : $BUILD_DIR"
+          echo "Dossier trouvé : $BUILD_DIR"
           cd "$BUILD_DIR"
           
-          # 2. Lister tout pour le log (aide au debug)
-          echo "Contenu du dossier de build :"
-          ls -F
-          
-          # 3. Boucler sur TOUS les fichiers (sauf resources.neu lui-même)
-          # On cherche les fichiers qui n'ont pas d'extension ou qui finissent par .exe
+          # On prend tout ce qui ressemble à un exécutable
           for file in *; do
-            # On ignore resources.neu et les dossiers
-            if [ "$file" != "resources.neu" ] && [ -f "$file" ]; then
-              echo "Packaging $file..."
-              zip -j "${{ github.workspace }}/artifacts/${file}.zip" "$file" "resources.neu"
+            if [ -f "$file" ] && [ "$file" != "resources.neu" ]; then
+               echo "Packaging $file..."
+               zip -j "${{ github.workspace }}/artifacts/${file}.zip" "$file" "resources.neu"
             fi
           done
-          
-          # 4. Vérification finale
-          echo "Fichiers zippés dans artifacts :"
-          ls "${{ github.workspace }}/artifacts"
 
       - name: Generate Release Tag
         id: tag
